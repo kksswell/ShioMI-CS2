@@ -1,10 +1,13 @@
 FROM php:8.1-apache
 
-# Устанавливаем расширение PDO MySQL для работы с базой данных
+# Устанавливаем расширения для работы с MySQL
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Копируем все файлы сайта в веб-директиву Apache
+# Настраиваем Apache, чтобы он слушал порт, который выдает Render (по умолчанию 80)
+RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+
+# Копируем файлы сайта
 COPY . /var/www/html/
 
-# Открываем порт 80 (стандартный для веб-серверов)
-EXPOSE 80
+# Даем права на чтение файлов
+RUN chown -r www-data:www-data /var/www/html
